@@ -1,0 +1,191 @@
+@page "/Form"
+@using System.Xml.Serialization
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+
+<h3>Formación Chilena Copa America 2024</h3>
+
+@if (_players == null)
+{
+    <p>
+        <em>Carga los jugadores:</em>
+        <br>
+        <button type="button" class="btn btn-primary" @onclick="LoadPlayersFromJson">Cargar desde JSON</button>
+        <button type="button" class="btn btn-secondary" @onclick="LoadPlayersFromXml">Cargar desde XML</button>
+
+    </p>
+}
+else
+{
+    <script src="js/utils.js"></script>
+    <EditForm Model="_formation" OnValidSubmit="HandleValidSubmit">
+        <!-- Arqueros -->
+        <div class="form-group">
+            <label>Arquero</label>
+            @for (var i = 0; i < 1; i++)
+            {
+                var value = i;
+                <InputSelect id="@($"player-{value}")" class="form-control" @bind-Value="_selectedPlayerNames[value]">
+                    <option value="">-- Escoge un jugador --</option>
+                    @foreach (var player in _players)
+                    {
+                        if (player.Position == "Arquero")
+                        {
+                            <option value="@player.Name">@player.Name</option>
+                        }
+                    }
+                </InputSelect>
+            }
+        </div>
+        <!-- Defensas -->
+        <div class="form-group">
+            <label>Defensas</label>
+            @for (var i = 1; i < 5; i++)
+            {
+                var value = i;
+                <InputSelect id="@($"player-{value}")" class="form-control" @bind-Value="_selectedPlayerNames[value]">
+                    <option value="">-- Escoge un jugador --</option>
+                    @foreach (var player in _players)
+                    {
+                        if (player.Position == "Defensa" || player.Position == "Lateral")
+                        {
+                            <option value="@player.Name">@player.Name</option>
+                        }
+                    }
+                </InputSelect>
+            }
+        </div>
+
+        <!-- Mediocampistas -->
+        <div class="form-group">
+            <label>Mediocampistas</label>
+            @for (var i = 5; i < 8; i++)
+            {
+                var value = i;
+                <InputSelect id="@($"player-{value}")" class="form-control" @bind-Value="_selectedPlayerNames[value]">
+                    <option value="">-- Escoge un jugador --</option>
+                    @foreach (var player in _players)
+                    {
+                        if (player.Position == "Pivote" || player.Position == "Mediocentro")
+                        {
+                            <option value="@player.Name">@player.Name</option>
+                        }
+                    }
+                </InputSelect>
+            }
+        </div>
+
+        <!-- Delanteros -->
+        <div class="form-group">
+            <label>Delanteros</label>
+            @for (var i = 8; i < 11; i++)
+            {
+                var value = i;
+                <InputSelect id="@($"player-{value}")" class="form-control" @bind-Value="_selectedPlayerNames[value]">
+                    <option value="">-- Escoge un jugador --</option>
+                    @foreach (var player in _players)
+                    {
+                        if (player.Position == "Delantero" || player.Position == "Extremo")
+                        {
+                            <option value="@player.Name">@player.Name</option>
+                        }
+                    }
+                </InputSelect>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="alert alert-danger">@_errorMessage</div>
+        }
+
+        <button type="button" class="btn btn-primary" @onclick="DownloadJson">Descargar JSON</button>
+        <button type="button" class="btn btn-secondary" @onclick="DownloadXml">Descargar XML</button>
+    </EditForm>
+}
+
+@code {
+    private Player[]? _players;
+    private Formation? _formation = new Formation();
+    private string[]? _selectedPlayerNames = new string[11];
+    private string? _errorMessage;
+
+
+    private async Task LoadPlayersFromJson()
+    {
+        _players = await Http.GetFromJsonAsync<Player[]>("player-data/players.json");
+    }
+
+    private async Task LoadPlayersFromXml()
+    {
+        var xmlStream = await Http.GetStreamAsync("player-data/players.xml");
+        var xmlSerializer = new XmlSerializer(typeof(Player[]), new XmlRootAttribute("Players"));
+        var players = (Player[]?)xmlSerializer.Deserialize(xmlStream);
+        _players = players;
+    }
+
+
+    public class Player
+    {
+        public string? Name { get; set; }
+
+        public string? Position { get; set; }
+    }
+
+
+    public class Formation
+    {
+        public Player[] Players { get; set; } = new Player[11];
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (_selectedPlayerNames.Any(name => string.IsNullOrEmpty(name)))
+        {
+            _errorMessage = "No puedes dejar posiciones vacías.";
+            return;
+        }
+
+        var uniquePlayers = new HashSet<string>(_selectedPlayerNames);
+        if (uniquePlayers.Count != _selectedPlayerNames.Length)
+        {
+            _errorMessage = "No se pueden seleccionar jugadores duplicados.";
+            return;
+        }
+
+        _errorMessage = null;
+
+        for (int i = 0; i < 11; i++)
+        {
+            var selectedPlayer = _players.FirstOrDefault(p => p.Name == _selectedPlayerNames[i]);
+            if (selectedPlayer != null)
+            {
+                _formation.Players[i] = selectedPlayer;
+            }
+        }
+    }
+
+    private async Task DownloadJson()
+    {
+        HandleValidSubmit();
+        if (_errorMessage != null) return;
+
+        var json = System.Text.Json.JsonSerializer.Serialize(_formation);
+        await JSRuntime.InvokeVoidAsync("downloadFile", "formacion.json", json);
+    }
+
+    private async Task DownloadXml()
+    {
+        HandleValidSubmit();
+        if (_errorMessage != null) return;
+
+        var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Formation));
+        using var memoryStream = new System.IO.MemoryStream();
+        xmlSerializer.Serialize(memoryStream, _formation);
+        memoryStream.Seek(0, System.IO.SeekOrigin.Begin);
+        var xml = new System.IO.StreamReader(memoryStream).ReadToEnd();
+        await JSRuntime.InvokeVoidAsync("downloadFile", "formacion.xml", xml);
+    }
+
+}
