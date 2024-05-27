@@ -3,6 +3,8 @@
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 
+<link rel="stylesheet" href="css/styles.css">
+
 
 <h3>Formación Chilena Copa America 2024</h3>
 
@@ -13,7 +15,6 @@
         <br>
         <button type="button" class="btn btn-primary" @onclick="LoadPlayersFromJson">Cargar desde JSON</button>
         <button type="button" class="btn btn-secondary" @onclick="LoadPlayersFromXml">Cargar desde XML</button>
-
     </p>
 }
 else
@@ -56,7 +57,6 @@ else
                 </InputSelect>
             }
         </div>
-
         <!-- Mediocampistas -->
         <div class="form-group">
             <label>Mediocampistas</label>
@@ -75,7 +75,6 @@ else
                 </InputSelect>
             }
         </div>
-
         <!-- Delanteros -->
         <div class="form-group">
             <label>Delanteros</label>
@@ -94,23 +93,66 @@ else
                 </InputSelect>
             }
         </div>
-
         @if (!string.IsNullOrEmpty(_errorMessage))
         {
             <div class="alert alert-danger">@_errorMessage</div>
         }
-
         <button type="button" class="btn btn-primary" @onclick="DownloadJson">Descargar JSON</button>
         <button type="button" class="btn btn-secondary" @onclick="DownloadXml">Descargar XML</button>
     </EditForm>
+
+    <svg width="1000" height="600" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+        <!-- Fondo del campo -->
+        <rect width="100%" height="100%" fill="#008000"/>
+        <!-- Líneas del campo -->
+        <rect x="50" y="50" width="900" height="500" fill="none" stroke="white" stroke-width="5"/>
+        <line x1="500" y1="50" x2="500" y2="550" stroke="white" stroke-width="5"/>
+        <circle cx="500" cy="300" r="75" fill="none" stroke="white" stroke-width="5"/>
+        <circle cx="500" cy="300" r="5" fill="white"/>
+        <!-- Área de meta izquierda -->
+        <rect x="50" y="125" width="150" height="350" fill="none" stroke="white" stroke-width="5"/>
+        <rect x="50" y="200" width="50" height="210" fill="none" stroke="white" stroke-width="5"/>
+        <rect x="25" y="240" width="25" height="125" fill="none" stroke="white" stroke-width="5"/>
+        
+        <!-- Área de meta derecha -->
+        <rect x="800" y="125" width="150" height="350" fill="none" stroke="white" stroke-width="5"/>
+        <rect x="900" y="200" width="50" height="210" fill="none" stroke="white" stroke-width="5"/>
+        <rect x="950" y="240" width="25" height="125" fill="none" stroke="white" stroke-width="5"/>
+
+        <!-- Puntos Penales -->
+        <circle cx="150" cy="300" r="5" fill="white"/>
+        <circle cx="850" cy="300" r="5" fill="white"/>
+        
+        <!-- Jugadores -->
+        @if (_formation?.Players != null)
+        {
+            @for (int i = 0; i < 11; i++)
+            {
+                var player = _formation.Players[i];
+                if (player != null)
+                {
+                    <circle cx="@_positions[i].X" cy="@_positions[i].Y" r="20" fill="red" stroke="black" stroke-width="2" />
+                    <svg:text x="@_positions[i].X" y="@(_positions[i].Y - 25)" fill="white" text-anchor="middle">@player.Name</svg:text>
+                }
+            }
+        }
+    </svg>
 }
 
 @code {
     private Player[]? _players;
     private Formation? _formation = new Formation();
-    private string[]? _selectedPlayerNames = new string[11];
+    private string[] _selectedPlayerNames = new string[11];
     private string? _errorMessage;
 
+// Jugador en sus posiciones en el campo
+    private (double X, double Y)[] _positions = new (double X, double Y)[11]
+    {
+        (75, 300),
+        (250, 150), (200, 250), (200, 350), (250, 450),
+        (500, 150), (450, 300), (500, 450),
+        (750, 150), (800, 300), (750, 450) 
+    };
 
     private async Task LoadPlayersFromJson()
     {
@@ -125,14 +167,11 @@ else
         _players = players;
     }
 
-
     public class Player
     {
         public string? Name { get; set; }
-
         public string? Position { get; set; }
     }
-
 
     public class Formation
     {
@@ -180,7 +219,7 @@ else
         HandleValidSubmit();
         if (_errorMessage != null) return;
 
-        var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Formation));
+        var xmlSerializer = new XmlSerializer(typeof(Formation));
         using var memoryStream = new System.IO.MemoryStream();
         xmlSerializer.Serialize(memoryStream, _formation);
         memoryStream.Seek(0, System.IO.SeekOrigin.Begin);

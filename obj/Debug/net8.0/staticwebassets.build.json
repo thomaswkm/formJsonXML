@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "OIB8ks/mRIyAdJsnVCcQUIRhQdBJyEo/NSP+zZqxbkI=",
+  "Hash": "BumMXFGh8RMLCL+/4I3nDxSt0L0YlPDgOl+/qRI/MLU=",
   "Source": "TeamSelection",
   "BasePath": "/",
   "Mode": "Root",
@@ -7862,6 +7862,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Identity": "C:\\Users\\thoma\\RiderProjects\\TeamSelection\\wwwroot\\css\\styles.css",
+      "SourceId": "TeamSelection",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\thoma\\RiderProjects\\TeamSelection\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "css/styles.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\styles.css"
     },
     {
       "Identity": "C:\\Users\\thoma\\RiderProjects\\TeamSelection\\wwwroot\\favicon.png",

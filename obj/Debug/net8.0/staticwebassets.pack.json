@@ -25,6 +25,10 @@
       "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css.map"
     },
     {
+      "Id": "C:\\Users\\thoma\\RiderProjects\\TeamSelection\\wwwroot\\css\\styles.css",
+      "PackagePath": "staticwebassets\\css\\styles.css"
+    },
+    {
       "Id": "C:\\Users\\thoma\\RiderProjects\\TeamSelection\\wwwroot\\favicon.png",
       "PackagePath": "staticwebassets\\favicon.png"
     },

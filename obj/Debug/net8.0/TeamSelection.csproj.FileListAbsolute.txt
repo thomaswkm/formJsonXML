@@ -1029,3 +1029,4 @@ C:\Users\thoma\RiderProjects\TeamSelection\obj\Debug\net8.0\TeamSelection.dll
 C:\Users\thoma\RiderProjects\TeamSelection\obj\Debug\net8.0\refint\TeamSelection.dll
 C:\Users\thoma\RiderProjects\TeamSelection\obj\Debug\net8.0\TeamSelection.pdb
 C:\Users\thoma\RiderProjects\TeamSelection\obj\Debug\net8.0\ref\TeamSelection.dll
+C:\Users\thoma\RiderProjects\TeamSelection\obj\Debug\net8.0\TeamSelection.sourcelink.json
